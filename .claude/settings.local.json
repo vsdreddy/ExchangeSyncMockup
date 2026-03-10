@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install)",
+      "Bash(npm install @angular/material@^21.2.0 @angular/cdk@^21.2.0)"
+    ]
+  }
+}
