@@ -44,19 +44,16 @@ import { DataService } from '../../core/services/data.service';
           </a>
         </mat-nav-list>
 
-        @for (org of data.pinnedOrgs(); track org.orgId) {
+        @for (org of data.orgs(); track org.orgId) {
           <div
             class="pinned-item"
-            [class.active]="router.url === '/config/' + org.orgId"
+            [class.active]="router.url.startsWith('/config/' + org.orgId)"
             (click)="router.navigate(['/config', org.orgId])"
           >
             <div class="pinned-dot"
               [style.background]="org.status === 'Active' ? 'var(--green)' : 'var(--amber)'">
             </div>
             <span class="pinned-name" [title]="org.name">{{ org.name }}</span>
-            <button class="unpin-btn"
-              (click)="$event.stopPropagation(); data.togglePin(org.orgId)"
-              title="Unpin">✕</button>
           </div>
         }
       </div>

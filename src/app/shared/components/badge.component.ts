@@ -18,7 +18,7 @@ export class BadgeComponent {
       Suspended: 'badge-amber', Pending: 'badge-amber',
       Development: 'badge-blue', Custom: 'badge-teal',
       Archived: 'badge-grey', Disabled: 'badge-grey', NotConfigured: 'badge-grey',
-      ExchangeOnline: 'badge-blue', GoogleWorkspace: 'badge-green',
+      ExchangeOnline: 'badge-blue',
     };
     return map[this.status] ?? 'badge-grey';
   }
@@ -64,14 +64,12 @@ export class PlatformBadgeComponent {
   @Input() platform = '';
 
   get cls(): string {
-    if (this.platform === 'ExchangeOnline')  return 'badge-blue';
-    if (this.platform === 'GoogleWorkspace') return 'badge-green';
+    if (this.platform === 'ExchangeOnline') return 'badge-blue';
     return 'badge-grey';
   }
 
   get label(): string {
-    if (this.platform === 'ExchangeOnline')  return 'Exchange';
-    if (this.platform === 'GoogleWorkspace') return 'Google';
+    if (this.platform === 'ExchangeOnline') return 'Exchange';
     return 'Unassigned';
   }
 }

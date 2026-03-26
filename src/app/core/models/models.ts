@@ -8,7 +8,7 @@ export type ConflictPolicy = 'SalesforceWins' | 'PlatformWins' | 'MostRecentWins
 export type AuthFlow = 'JwtBearer' | 'OAuthAuthorizationCode';
 export type EnvType = 'Production' | 'Staging' | 'Development' | 'Custom';
 export type OrgStatus = 'Active' | 'Suspended' | 'Archived';
-export type Platform = 'ExchangeOnline' | 'GoogleWorkspace' | 'Unassigned';
+export type Platform = 'ExchangeOnline' | 'Unassigned';
 
 export interface FieldMapping {
   id: string;
@@ -44,14 +44,6 @@ export interface ExchangeConfig {
   isVerified: boolean;
 }
 
-export interface GoogleConfig {
-  domain: string;
-  clientId: string;
-  serviceAccountEmail: string;
-  scopes: string[];
-  channelTtlDays: number;
-  isVerified: boolean;
-}
 
 export interface UserObjectSync {
   [objectType: string]: SyncDirection | null;
@@ -77,7 +69,6 @@ export interface Environment {
   isDefault: boolean;
   sfConfig: SalesforceConfig | null;
   exchangeConfig: ExchangeConfig | null;
-  googleConfig: GoogleConfig | null;
   mappings: { [key: string]: ObjectMapping };
   users: SyncUser[];
 }
@@ -113,7 +104,7 @@ export interface AuditEntry {
 }
 
 export const OBJECT_TYPES = ['CalendarEvent', 'Contact', 'Task', 'EmailActivity'] as const;
-export const PLATFORMS = ['ExchangeOnline', 'GoogleWorkspace'] as const;
+export const PLATFORMS = ['ExchangeOnline'] as const;
 
 export const OBJECT_META: Record<string, { icon: string; label: string }> = {
   CalendarEvent: { icon: '📅', label: 'Calendar Event' },
@@ -123,9 +114,8 @@ export const OBJECT_META: Record<string, { icon: string; label: string }> = {
 };
 
 export const PLATFORM_META: Record<string, { label: string; short: string }> = {
-  ExchangeOnline:  { label: 'Exchange Online',  short: 'Exchange' },
-  GoogleWorkspace: { label: 'Google Workspace', short: 'Google' },
-  Unassigned:      { label: 'Unassigned',        short: '—' },
+  ExchangeOnline: { label: 'Exchange Online', short: 'Exchange' },
+  Unassigned:     { label: 'Unassigned',       short: '—' },
 };
 
 export const DIRECTION_OPTIONS: { value: SyncDirection; label: string }[] = [

@@ -56,16 +56,16 @@ export function buildDefaultMappings(): { [key: string]: ObjectMapping } {
 // ── Mock DLQ & Audit ─────────────────────────────────────────────────────────
 export const MOCK_DLQ: DlqItem[] = [
   { id: 'dlq-001', org: 'Client Management', env: 'Production', eventType: 'CalendarEvent.Updated', platform: 'ExchangeOnline',  attempts: 3, lastAttempt: '2026-03-08 09:14', error: 'Graph API 429 — rate limit exceeded',                    status: 'Dead' },
-  { id: 'dlq-002', org: 'Client Management', env: 'Production', eventType: 'Contact.Created',       platform: 'GoogleWorkspace', attempts: 2, lastAttempt: '2026-03-08 08:52', error: 'Service account token expired',                            status: 'Dead' },
+  { id: 'dlq-002', org: 'Client Management', env: 'Production', eventType: 'Contact.Created',       platform: 'ExchangeOnline',  attempts: 2, lastAttempt: '2026-03-08 08:52', error: 'Graph API token expired',                                  status: 'Dead' },
   { id: 'dlq-003', org: 'Client Dashboard',  env: 'Production', eventType: 'Task.Deleted',           platform: 'ExchangeOnline',  attempts: 1, lastAttempt: '2026-03-08 07:30', error: 'Exchange webhook signature invalid',                       status: 'Dead' },
   { id: 'dlq-004', org: 'Client Management', env: 'UAT',        eventType: 'EmailActivity.Logged',   platform: 'ExchangeOnline',  attempts: 3, lastAttempt: '2026-03-07 23:01', error: 'Salesforce API field not found: CustomField__c',           status: 'Dead' },
-  { id: 'dlq-005', org: 'Client Management', env: 'Production', eventType: 'CalendarEvent.Created',  platform: 'GoogleWorkspace', attempts: 2, lastAttempt: '2026-03-07 21:18', error: 'Conflict: MostRecentWins — stale version detected',        status: 'Retrying' },
+  { id: 'dlq-005', org: 'Client Management', env: 'Production', eventType: 'CalendarEvent.Created',  platform: 'ExchangeOnline',  attempts: 2, lastAttempt: '2026-03-07 21:18', error: 'Conflict: MostRecentWins — stale version detected',        status: 'Retrying' },
 ];
 
 export const MOCK_AUDIT: AuditEntry[] = [
   { id: 'a001', ts: '2026-03-08 09:41', user: 'admin@company.com', action: 'Config.Updated',  resource: 'Acme Corp / Production / Exchange',          detail: 'Updated subscriptionRenewalDays: 3 → 2' },
   { id: 'a002', ts: '2026-03-08 09:14', user: 'system',            action: 'Sync.Failed',     resource: 'Acme Corp / Production / CalendarEvent',     detail: 'DLQ after 3 retries — Graph 429' },
-  { id: 'a003', ts: '2026-03-08 08:52', user: 'system',            action: 'Token.Expired',   resource: 'Acme Corp / Production / Google',             detail: 'Service account token refresh failed' },
+  { id: 'a003', ts: '2026-03-08 08:52', user: 'system',            action: 'Token.Expired',   resource: 'Acme Corp / Production / Exchange',           detail: 'Exchange token refresh failed' },
   { id: 'a004', ts: '2026-03-08 08:00', user: 'admin@company.com', action: 'User.Onboarded',  resource: 'Acme Corp / Production / jane.smith@acme',   detail: 'Initial sync triggered — Exchange Online' },
   { id: 'a005', ts: '2026-03-07 17:30', user: 'admin@company.com', action: 'Mapping.Updated', resource: 'Acme Corp / Production / Contact → Exchange', detail: 'Conflict policy: SalesforceWins → MostRecentWins' },
   { id: 'a006', ts: '2026-03-07 14:22', user: 'admin@company.com', action: 'Env.Created',     resource: 'Acme Corp / UAT',                             detail: 'Environment cloned from Production' },
@@ -85,11 +85,10 @@ const SEED_ORGS: Organisation[] = [
         envId: 'env-001', orgId: 'org-001', name: 'Production', type: 'Production', status: 'Active', isDefault: true,
         sfConfig: { instanceUrl: 'https://acme.my.salesforce.com', consumerKey: '3MVG9pRiRo...XXXX', authFlow: 'JwtBearer', sandboxName: '', apiVersion: 'v59.0', isVerified: true },
         exchangeConfig: { tenantId: '550e8400-e29b-41d4-a716', clientId: '7c9e6679-7425-40de', scopes: ['Calendars.ReadWrite', 'Contacts.ReadWrite', 'Tasks.ReadWrite', 'Mail.Read'], subscriptionRenewalDays: 2, isVerified: true },
-        googleConfig: { domain: 'acme.com', clientId: '123456-abc.apps.google.com', serviceAccountEmail: 'sync@acme.iam.gserviceaccount.com', scopes: ['calendar', 'contacts', 'tasks', 'gmail.readonly'], channelTtlDays: 5, isVerified: true },
         mappings: buildDefaultMappings(),
         users: [
           { userId: 'u1', salesforceUserId: '0055g001', email: 'jane.smith@acme.com', displayName: 'Jane Smith', assignedPlatform: 'ExchangeOnline', isEnabled: true, onboardedAt: '2026-01-20', objectSyncs: { CalendarEvent: null, Contact: 'SalesforceToPlatform', Task: null, EmailActivity: null } },
-          { userId: 'u2', salesforceUserId: '0055g002', email: 'john.doe@acme.com',   displayName: 'John Doe',   assignedPlatform: 'GoogleWorkspace', isEnabled: true, onboardedAt: '2026-01-20', objectSyncs: { CalendarEvent: null, Contact: null, Task: 'Disabled', EmailActivity: null } },
+          { userId: 'u2', salesforceUserId: '0055g002', email: 'john.doe@acme.com',   displayName: 'John Doe',   assignedPlatform: 'ExchangeOnline',  isEnabled: true, onboardedAt: '2026-01-20', objectSyncs: { CalendarEvent: null, Contact: null, Task: 'Disabled', EmailActivity: null } },
           { userId: 'u3', salesforceUserId: '0055g003', email: 'mike.lee@acme.com',   displayName: 'Mike Lee',   assignedPlatform: 'ExchangeOnline',  isEnabled: true, onboardedAt: null,         objectSyncs: { CalendarEvent: null, Contact: null, Task: null, EmailActivity: null } },
         ],
       },
@@ -97,7 +96,7 @@ const SEED_ORGS: Organisation[] = [
         envId: 'env-002', orgId: 'org-001', name: 'UAT', type: 'Staging', status: 'Active', isDefault: false,
         sfConfig: { instanceUrl: 'https://acme--uat.sandbox.my.salesforce.com', consumerKey: '3MVG9pRiRo...UAT', authFlow: 'JwtBearer', sandboxName: 'uat', apiVersion: 'v59.0', isVerified: true },
         exchangeConfig: { tenantId: '550e8400-e29b-41d4-a716', clientId: '7c9e6679-7425-40de', scopes: ['Calendars.ReadWrite', 'Contacts.ReadWrite'], subscriptionRenewalDays: 2, isVerified: false },
-        googleConfig: null, mappings: buildDefaultMappings(), users: [],
+        mappings: buildDefaultMappings(), users: [],
       },
     ],
   },
@@ -105,7 +104,7 @@ const SEED_ORGS: Organisation[] = [
     orgId: 'org-002', name: 'Client Dashboard', slug: 'beta-industries',
     salesforceInstanceUrl: 'https://beta.my.salesforce.com', status: 'Active',
     environments: [
-      { envId: 'env-003', orgId: 'org-002', name: 'Production', type: 'Production', status: 'Active', isDefault: true, sfConfig: null, exchangeConfig: null, googleConfig: null, mappings: buildDefaultMappings(), users: [] },
+      { envId: 'env-003', orgId: 'org-002', name: 'Production', type: 'Production', status: 'Active', isDefault: true, sfConfig: null, exchangeConfig: null, mappings: buildDefaultMappings(), users: [] },
     ],
   },
   {
@@ -149,6 +148,10 @@ export class DataService {
     this.orgs.update(orgs => orgs.map(o =>
       o.orgId !== orgId ? o : { ...o, environments: [...o.environments, env] }
     ));
+  }
+
+  deleteOrg(orgId: string): void {
+    this.orgs.update(orgs => orgs.filter(o => o.orgId !== orgId));
   }
 
   togglePin(orgId: string): void {

@@ -10,7 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatDialogModule, MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { DataService } from '../../../core/services/data.service';
+import { DataService, buildDefaultMappings } from '../../../core/services/data.service';
 import { BadgeComponent } from '../../../shared/components/badge.component';
 import { Organisation } from '../../../core/models/models';
 
@@ -122,7 +122,6 @@ export class OrgFormDialogComponent {
                 <tr>
                   <th>Application</th>
                   <th>Salesforce Instance</th>
-                  <th>Environments</th>
                   <th>Users</th>
                   <th>Status</th>
                   <th>Actions</th>
@@ -136,7 +135,6 @@ export class OrgFormDialogComponent {
                       <div class="font-mono">{{ org.slug }}</div>
                     </td>
                     <td><span class="font-mono">{{ org.salesforceInstanceUrl }}</span></td>
-                    <td>{{ org.environments.length }}</td>
                     <td>{{ totalUsers(org) }}</td>
                     <td><app-badge [status]="org.status" /></td>
                     <td (click)="$event.stopPropagation()">
@@ -145,12 +143,8 @@ export class OrgFormDialogComponent {
                           (click)="router.navigate(['/config', org.orgId])">Open</button>
                         <button mat-button style="font-size:11px;line-height:28px;padding:0 8px"
                           (click)="openEdit(org)">Edit</button>
-                        <button mat-icon-button style="width:28px;height:28px;line-height:28px"
-                          [title]="isPinned(org.orgId) ? 'Unpin' : 'Pin to sidebar'"
-                          [style.color]="isPinned(org.orgId) ? 'var(--amber)' : 'var(--text-3)'"
-                          (click)="data.togglePin(org.orgId)">
-                          {{ isPinned(org.orgId) ? '📌' : '📍' }}
-                        </button>
+                        <button mat-button style="font-size:11px;line-height:28px;padding:0 8px;color:var(--error,#f44336)"
+                          (click)="deleteOrg(org.orgId)">Delete</button>
                       </div>
                     </td>
                   </tr>
@@ -184,7 +178,9 @@ export class OrgListComponent {
   totalUsers = (org: Organisation) =>
     org.environments.reduce((n, e) => n + e.users.length, 0);
 
-  isPinned = (id: string) => this.data.pinnedOrgIds().includes(id);
+  deleteOrg(orgId: string): void {
+    this.data.deleteOrg(orgId);
+  }
 
   openAdd(): void {
     const ref = this.dialog.open(OrgFormDialogComponent, {
@@ -195,9 +191,17 @@ export class OrgListComponent {
     });
     ref.afterClosed().subscribe(result => {
       if (result) {
+        const orgId = `org-${Date.now()}`;
+        const envId = `env-${Date.now()}`;
         this.data.addOrg({
-          orgId: `org-${Date.now()}`,
-          environments: [],
+          orgId,
+          environments: [{
+            envId, orgId,
+            name: 'Production', type: 'Production',
+            status: 'Active', isDefault: true,
+            sfConfig: null, exchangeConfig: null,
+            mappings: buildDefaultMappings(), users: [],
+          }],
           ...result,
         });
       }

@@ -141,15 +141,9 @@ import { BadgeComponent } from '../../shared/components/badge.component';
                 </div>
               }
               <div class="divider"></div>
-              <div class="grid-2" style="text-align:center">
-                <div>
-                  <div style="font-size:18px;font-weight:600;color:var(--accent)">1,583</div>
-                  <div class="text-xs text-muted">Exchange syncs today</div>
-                </div>
-                <div>
-                  <div style="font-size:18px;font-weight:600;color:var(--purple)">1,045</div>
-                  <div class="text-xs text-muted">Google syncs today</div>
-                </div>
+              <div style="text-align:center">
+                <div style="font-size:18px;font-weight:600;color:var(--accent)">1,583</div>
+                <div class="text-xs text-muted">Exchange syncs today</div>
               </div>
             </div>
           </mat-card-content>
@@ -208,7 +202,6 @@ export class DashboardComponent {
         const issues = [
           !e.sfConfig?.isVerified && 'Salesforce',
           !e.exchangeConfig?.isVerified && 'Exchange',
-          !e.googleConfig?.isVerified && 'Google',
         ].filter(Boolean) as string[];
         return {
           name: `${o.name} / ${e.name}`,
@@ -224,8 +217,7 @@ export class DashboardComponent {
   platforms = computed(() => {
     const t = this.totalUsers();
     return [
-      { label: 'Exchange Online',  users: Math.round(t * .6), pct: 60, color: 'var(--accent)' },
-      { label: 'Google Workspace', users: Math.round(t * .4), pct: 40, color: 'var(--purple)' },
+      { label: 'Exchange Online', users: t, pct: 100, color: 'var(--accent)' },
     ];
   });
 
